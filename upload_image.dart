@@ -56,7 +56,7 @@ class _UploadImageState extends State<UploadImage> {
             onPressed: (){
               openImagePicker();
             },
-            child: const Text('ユーザー登録', style: TextStyle(color: Colors.white),),
+            child: const Text('画像の選択', style: TextStyle(color: Colors.white),),
             style: ButtonStyle(
                 padding: MaterialStateProperty.all(const EdgeInsets.all(20)),
                 shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)))
