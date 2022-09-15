@@ -61,6 +61,19 @@ class BlockNotifier extends StateNotifier<List<Block>>{
           todo,
     ];
   }
+
+  //stateの要素を入れ替えるメソッド。
+  //List型のstateの更新は、要素を変えるだけでは認識してくれないので、新しいリストを代入する必要があります。
+  void reorder(int oldIndex, int newIndex) {
+    List<Block> newList = [];
+    for(int i = 0; i<state.length; i++){
+      if(i!=oldIndex){
+        newList.add(state[i]);
+      }
+    }
+    newList.insert(newIndex, state[oldIndex]);
+    state = newList;
+  }
 }
 
 // StatNotifierの更新を監視できるようにするために必要です。
@@ -82,7 +95,6 @@ final hiddenListProvider = Provider<List<Block>>((ref){
   return blockList.where((element) => !element.isVisible).toList();
 });
 
-// stateを反映させるウィジェットはConsumerWidgetを使う。
 class MyHomePage extends ConsumerWidget {
   const MyHomePage({Key? key}) : super(key: key);
 
@@ -106,7 +118,7 @@ class MyHomePage extends ConsumerWidget {
                 const Text('表示'),
                 SizedBox(
                   height: 300,
-                  child: ListView.builder(
+                  child: ReorderableListView.builder(
                     itemCount: visibleBlockList.length,
                     itemBuilder: (context, index){
                       return Dismissible(
@@ -120,8 +132,16 @@ class MyHomePage extends ConsumerWidget {
                         ),
                         child: ListTile(
                           title: Text(visibleBlockList[index].name),
-                        )
+                        ),
                       );
+                    },
+                    onReorder: (int oldIndex, int newIndex) {
+                      if (oldIndex < newIndex) {
+                        newIndex -= 1;
+                      }
+                      
+                      // 状態の変更はblockListProviderからBlockNotifierのメソッドを呼び出す必要があります。
+                      ref.read(blockListProvider.notifier).reorder(oldIndex, newIndex);
                     },
                   ),
                 ),
